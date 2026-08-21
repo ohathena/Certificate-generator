@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Certificate Registry — Bulk Generator</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="index.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+
+  <header class="masthead">
+    <div class="eyebrow">Certificate Registry</div>
+    <h1 class="title">Turn a spreadsheet into <em>signed</em> certificates.</h1>
+    <p class="lede">Upload a donor list and issue a formal PDF certificate for every valid row — named, dated, and ready to send.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <span class="step-label">01 — Upload the donor list</span>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload Excel file">
+        <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="drop-title">Drop your .xlsx file here</p>
+        <p class="drop-sub">or click to browse — needs columns <code>Name</code>, <code>Age</code>, <code>Amount</code></p>
+      </div>
+
+      <input type="file" id="excelFile" accept=".xlsx,.xls">
+
+      <div id="ledgerWrap" class="ledger-wrap" style="display:none">
+        <div class="ledger-title">
+          <h3>Parsed records</h3>
+          <span class="ledger-count" id="ledgerCount"></span>
+        </div>
+        <table class="ledger">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Age</th><th>Amount</th><th>Status</th></tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+        <div class="ledger-more" id="ledgerMore"></div>
+      </div>
+
+      <div class="generate-row">
+        <button id="generateBtn" disabled>Generate certificates</button>
+        <span class="gen-hint" id="genHint">Upload a file to continue</span>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-status">
+          <span id="progressText">Preparing…</span>
+          <span id="progressPct">0%</span>
+        </div>
+      </div>
+
+      <div class="done-wrap" id="doneWrap">
+        <div class="seal">CERTS<br>ISSUED</div>
+        <div class="done-text">
+          <h3 id="doneTitle">All certificates generated</h3>
+          <p id="doneSub">Downloaded as a single ZIP file.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="note">Runs entirely in your browser — no file is uploaded anywhere. Certificates are bundled into one ZIP on your device.</footer>
+
+  <!-- Template only, captured off-screen, never shown directly -->
+  <div id="certificate" style="display:none">
+    <div class="cert-outer">
+      <div class="cert-inner">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="cert-hdr">This certifies that</div>
+        <h1 class="cert-h1">Certificate</h1>
+        <div class="cert-sub">of Appreciation</div>
+        <div class="cert-rule"></div>
+        <div id="certName"></div>
+        <p class="cert-p">Age: <span id="certAge"></span></p>
+        <p class="cert-p">In recognition of the generous contribution of</p>
+        <p id="certAmount"></p>
+        <p class="cert-p">Your generosity and support are sincerely appreciated.<br>Thank you for making a meaningful difference.</p>
+        <div class="cert-footer">
+          <div class="cert-line">Authorized Signature</div>
+          <div class="cert-seal">OFFICIAL<br>SEAL</div>
+          <div class="cert-line">Date: <span id="certDate"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
+</html>
